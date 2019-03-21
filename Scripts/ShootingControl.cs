@@ -5,6 +5,7 @@ using UnityEngine;
 public class ShootingControl : MonoBehaviour {
     public GameObject moneyBullet; //gona be GameObejct[] with rotation;
 
+
     void storeBullets() { }
     void rotateBullets() { }
     // Use this for initialization
@@ -15,9 +16,11 @@ public class ShootingControl : MonoBehaviour {
         if (moneyBullet == null)
         {
             MapTiles();
-
+            MoneyBullet attr = moneyBullet.GetComponent<MoneyBullet>();
+            attr.isReady = true;
             moneyBullet.transform.position = new Vector3(gameObject.transform.position.x,
                                                         gameObject.transform.position.y, 0);
+            
         }
         //loadCheck = true;
     }
@@ -63,6 +66,7 @@ public class ShootingControl : MonoBehaviour {
             attr.isShot = true;
             
             LoadBullet();
+
         }
     }
 }

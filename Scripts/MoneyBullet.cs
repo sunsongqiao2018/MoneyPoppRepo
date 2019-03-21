@@ -1,74 +1,93 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class MoneyBullet:MonoBehaviour{
+public class MoneyBullet : MonoBehaviour
+{
     //private Sprite moneyImage;
     public int value;
     public bool isShot;
-    public bool isTile;
-    private Rigidbody2D rb;
-    private void Awake()
-    {
-        
-    }
+    public bool isReady;
+    private Rigidbody2D rbBullet;
+    private BoxCollider2D col;
+    public float moveSpeed = 4.0f;
+    private static int bulletCount;
+    //UnityEvent bulletEvent = new UnityEvent();
+
     private void Start()
     {
+        // bulletEvent.AddListener(BulletTrigger);
         SpriteRenderer sprRen = gameObject.GetComponentInChildren<SpriteRenderer>();
-       
-        value = int.Parse(sprRen.sprite.name.Substring(4));
 
-        BoxCollider2D col = gameObject.GetComponent<BoxCollider2D>();
+        value = int.Parse(sprRen.sprite.name.Substring(4)); //get money values;
+        isShot = false;
+
+
+        col = gameObject.GetComponent<BoxCollider2D>();
         col.size = new Vector2(0.9f, 0.9f);
-        if (isShot) {
-           rb = gameObject.AddComponent<Rigidbody2D>();
-            col.isTrigger = false;
-            rb.gravityScale = 0;
-        }
+
     }
     private void Update()
     {
-        if (isShot) {
-            gameObject.transform.Translate(Vector3.up * 0.3f);
-            if (gameObject.transform.position.y > 5) {
+        if (isShot)
+        {
+            if (rbBullet == null)
+            {
+                rbBullet = gameObject.AddComponent<Rigidbody2D>();
+                rbBullet.isKinematic = true;
+                //col.enabled = false;
+            }
+            rbBullet.velocity = Vector2.up * moveSpeed;
+
+            if (gameObject.transform.position.y > 5)
+            {
                 Destroy(gameObject);
             }
         }
-        
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D bullet)
     {
-        MoneyBullet colBullet = collision.gameObject.GetComponent<MoneyBullet>();
-        colBullet.isShot = false;
-        collision.gameObject.transform.position = gameObject.transform.position;
-        if (!isShot)
+        //need to do when Trigger : compare value -> equal ? merge : stack;
+        // check surrounding.
+        if (!isShot &&!isReady)
         {
-           // Destroy(gameObject);
+            var tileCol = gameObject.GetComponent<MoneyBullet>();
+            var bulletCol = bullet.gameObject.GetComponent<MoneyBullet>();
+            if (tileCol.value == bulletCol.value)
+            {
+
+                tileCol.value += bulletCol.value;
+
+                Destroy(bulletCol.gameObject);     //not right, but let it be first.
+                //add first then check surrrounding.
+               
+            }
+            else
+            {
+                bulletCol.moveSpeed = 0f; 
+                //stop bullet 
+            }
         }
     }
+
+
+    private void OnTriggerExit(Collider bullet)
+    {
+        //merge bullet with save value;
+    }
 }
 
-public class MoneyBulletShot : MoneyBullet {
-    private void Start()
-    {
-        isShot = false;
-        isTile = false;
-    }
-    private void Update()
-    {
+//public class MoneyBulletTile : MoneyBullet
+//{
+//    private void Start()
+//    {
+//        isShot = false;
+//        isTile = true;
+//    }
+//    private void Update()
+//    {
 
-    }
-}
-public class MoneyBulletTile : MoneyBullet
-{
-    private void Start()
-    {
-        isShot = false;
-        isTile = true;
-    }
-    private void Update()
-    {
-
-    }
-}
+//    }
+//}
