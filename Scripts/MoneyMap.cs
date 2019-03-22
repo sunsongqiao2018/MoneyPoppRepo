@@ -43,6 +43,17 @@ public class MoneyMap : MonoBehaviour {
         }
     }
 
+    public GameObject GetTiles(int tileGetter) {
+
+        return tiles[tileGetter];
+    }
+    public void SetTile(GameObject tile,int tileNum) {
+        tiles[tileNum] = tile;
+    }
+    public Vector3 GetMap(int mapNum) {
+
+        return moneyMap[mapNum];
+    }
     private void RowMapping(int col) {
 
         for (var i = 0; i < col; ++i) 
@@ -91,6 +102,7 @@ public class MoneyMap : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
+
         if (Input.GetKeyDown(KeyCode.Space)) {  //change a trigger perhaps use a bool factor to determine the bullet is set or not.
 
             //From Last Row -Copy-> Second Last Row... to Second Copy-> Fisrt, Fisrt Generate New row;

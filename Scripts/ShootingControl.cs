@@ -53,15 +53,14 @@ public class ShootingControl : MonoBehaviour {
     }
         void Start ()
     {
-        LoadBullet();
+
 
     }
-	
 	// Update is called once per frame
 	void Update () {
         if (Input.GetKeyDown(KeyCode.Space))    //shoot bullet &reload
         {
-            
+           
             MoneyBullet attr = moneyBullet.GetComponent<MoneyBullet>();
             attr.isShot = true;
             
