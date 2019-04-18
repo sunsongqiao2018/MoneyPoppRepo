@@ -16,12 +16,7 @@ public class MoneyMap : MonoBehaviour {
         IsneedAlignTiles = false;
         tiles = new GameObject[mapSize];
         LoadMap(mapSize);
-        //SetInitialRows();
-        //foreach (Vector3 a in moneyMapPositions) {
-        //    Debug.Log(string.Format("{0} and{1}", a.x, a.y));
-        //}
-       
-        InvokeRepeating("UpdateMapValues", 0.0f, 10.0f);
+        InvokeRepeating("UpdateMapValues", 0.0f, 10.0f);        //constant update maps by time past.
         totalSum = Random.Range(8, 100);
     }
     void SetInitialRows() {
@@ -163,6 +158,7 @@ public class MoneyMap : MonoBehaviour {
     void Update()
     {
         if (IsneedAlignTiles) {
+            Debug.Log("tiles re-aligned");
             AlignTiles();
         }
        
