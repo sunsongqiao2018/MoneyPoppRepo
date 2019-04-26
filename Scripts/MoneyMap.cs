@@ -8,60 +8,59 @@ public class MoneyMap : MonoBehaviour {
     public static bool IsneedAlignTiles;
     public Vector3[] moneyMapPositions;
     private GameObject[] tiles;
-    private int totalSum;
+    //private int totalSum;
    
-    public int mapSize = 80;
+    private int mapSize = 80;
     // Use this for initialization
     void Start () {
         IsneedAlignTiles = false;
         tiles = new GameObject[mapSize];
         LoadMap(mapSize);
-        InvokeRepeating("UpdateMapValues", 0.0f, 10.0f);        //constant update maps by time past.
-        totalSum = Random.Range(8, 100);
+        Debug.Log(moneyMapPositions.Length);
+        InvokeRepeating("UpdateMapValues", 0.0f, 8.0f);        //constant update maps by time past.
+        //totalSum = Random.Range(8, 100);
     }
     void SetInitialRows() {
-        float tileOnePercen;
-        float tileTwoPercen;
-        float tileThrPercen;
-        float tileTotalBase;
-        float tileOneRatio;
-        float tileTwoRatio;
-        float tileThrRatio;
+        float probability;
         for (int i = 0; i < 8; i++)
         {
-            tileOnePercen = totalSum / 1;
-            tileTwoPercen = totalSum / 5;
-            tileThrPercen = totalSum / 10;
-            tileTotalBase = tileOnePercen + tileTwoPercen + tileThrPercen;
-            tileOneRatio = tileOnePercen / tileTotalBase;
-            tileTwoRatio = tileTwoPercen / tileTotalBase;
-            tileThrRatio = tileThrPercen / tileTotalBase;
-            if (totalSum < 1)
+            probability = Random.Range(0.0f, 1.0f);
+
+            //float ranDice = Random.Range(0.0f, 1.0f);
+            if (probability < 0.3f)
             {
-                totalSum = Random.Range(8, 49); //regiven value to total sum agian;
+                mapDic[moneyMapPositions[i]] = 1;
+
             }
-            float ranDice = Random.Range(0.0f, 1.0f);
-            if (ranDice < tileThrRatio)
-            {
-                mapDic[moneyMapPositions[i]] = 10;
-                totalSum -= 10;
-            }
-            else if (ranDice < tileThrRatio + tileTwoRatio)
+            else if (probability < 0.6f)
             {
                 mapDic[moneyMapPositions[i]] = 5;
-                totalSum -= 5;
+
+            }
+            else if (probability < 0.8f)
+            {
+                mapDic[moneyMapPositions[i]] = 10;
+
+            }
+            else if (probability < 0.95f)
+            {
+                mapDic[moneyMapPositions[i]] = 50;
+
             }
             else
             {
-                mapDic[moneyMapPositions[i]] = 1;
-                totalSum--;
+          
+                    mapDic[moneyMapPositions[i]] = 100;
+
+                
             }
             //Debug.Log(mapDic[moneyMapPositions[i]]);
         }
     }
     void LoadMap(int size) {
+        size = mapSize;
         mapDic = new Dictionary<Vector3, int>();
-        moneyMapPositions = new Vector3[mapSize];
+        moneyMapPositions = new Vector3[size];
         moneyMapPositions[0] = new Vector3(-3.5f, 4.5f); //set the first anchor point;
         float Yxis = 4.5f;
         for (var i = 1; i < moneyMapPositions.Length; ++i)
@@ -69,7 +68,7 @@ public class MoneyMap : MonoBehaviour {
             if (i % 8 == 0)
             {
                 Yxis--;
-                moneyMapPositions[i] = new Vector3(-3.5f, Yxis); //Reset to the beginning of the row 
+                moneyMapPositions[i] = new Vector3(-3.5f, Yxis); //Reset to the beginning of the next row 
             }
             else
             {
@@ -82,7 +81,7 @@ public class MoneyMap : MonoBehaviour {
         }
     }
     void UpdateMapValues() {
-        for (int i = 7;i >= 0;i--) {
+        for (int i = 9;i >= 0;i--) {
             if (i == 0)
             {
                 SetInitialRows();
@@ -120,6 +119,10 @@ public class MoneyMap : MonoBehaviour {
                     break;
                 case 50:
                     tiles[i] = Instantiate(Resources.Load("Cash50")) as GameObject;
+                    tiles[i].transform.position = position;
+                    break;
+                case 100:
+                    tiles[i] = Instantiate(Resources.Load("Cash100")) as GameObject;
                     tiles[i].transform.position = position;
                     break;
                 default:
@@ -161,7 +164,6 @@ public class MoneyMap : MonoBehaviour {
             Debug.Log("tiles re-aligned");
             AlignTiles();
         }
-       
         ///----------------Folded------------------//
         //if (!ShootingControl.isHoldMoney && Input.GetKeyDown(KeyCode.Space)) //player press space and is currently not holding any money. we update map and value at the same time.
         //{

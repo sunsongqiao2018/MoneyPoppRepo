@@ -13,8 +13,10 @@ public class ShootingControl : MonoBehaviour {
     private List<Vector3> positionsPool;
     public float moveSpeed = 1.0f;
     public static int gameScore;
+    private Vector3[] scanner = new Vector3[72];
     //public MoneyMap moneyMap; //better hard code the position value in??
     //private int monScore = 0;
+
     void storeBullets() { }
     void rotateBullets() { }
     // Use this for initialization
@@ -25,6 +27,7 @@ public class ShootingControl : MonoBehaviour {
         
         isHoldMoney = false;
         moneyBullet = new GameObject();
+        SetScanner();
         //StartCoroutine(Example());
 
     }
@@ -51,10 +54,17 @@ public class ShootingControl : MonoBehaviour {
             case 50:
                 moneyBullet = Instantiate(Resources.Load("Cash50")) as GameObject;
                 break;
+            case 100:
+                moneyBullet = Instantiate(Resources.Load("Cash100")) as GameObject;
+                break;
             default:
                 break;
         }
     }
+
+
+
+
     void CatchBullet() {
         
        var playerCurrentX = gameObject.transform.position.x;
@@ -79,7 +89,12 @@ public class ShootingControl : MonoBehaviour {
             //Debug.Log(string.Format("No value at {0}", tempVec));
         }
     }
-    void moveBullet()               //this method is to give a movement animation after player fire the money. not work yet, possible due to refresh sequecene or rate.
+
+
+
+    //this function is not working
+    //this method is to give a movement animation after player fire the money. not work yet, possible due to refresh sequecene or rate.
+    void moveBullet()               
     {
         var playerCurrentX = gameObject.transform.position.x;
         Vector3 targetPosition = new Vector3();
@@ -98,11 +113,18 @@ public class ShootingControl : MonoBehaviour {
                     targetPosition = new Vector3(playerCurrentX, 4.5f);
                 }
             }
-            catch(KeyNotFoundException e) {}
+            catch(KeyNotFoundException e) {
+            }
         }
         var step = moveSpeed * Time.deltaTime;
         moneyBullet.transform.position = Vector3.MoveTowards(moneyBullet.transform.position, targetPosition, step);
     }
+
+
+
+
+
+
     void FireBullet()       //this method contains calculations after player fire a money bullet to map.
     {
         var playerCurrentX = gameObject.transform.position.x;
@@ -113,11 +135,15 @@ public class ShootingControl : MonoBehaviour {
             int ThisRoundPoint = 0;
             try
             {
-                if (MoneyMap.mapDic[tempVec] != 0)
+                if (MoneyMap.mapDic[tempVec] != 0 ||(y == 4.5f && MoneyMap.mapDic[tempVec] == 0))
                 {
                     MoneyMap.mapDic[tempStayPosi] = CatchedBulletValue;
-                    OneRoundScore(tempStayPosi, CatchedBulletValue);
+
+                    OneRoundScore(tempStayPosi, CatchedBulletValue);    //This function changes positionsPool.
+
+
                     Vector3 lastPosition = positionsPool[positionsPool.Count - 1];
+
 
                     foreach (Vector3 poolEle in positionsPool) {
                         ThisRoundPoint += MoneyMap.mapDic[poolEle];
@@ -150,11 +176,14 @@ public class ShootingControl : MonoBehaviour {
                         }
                         gameScore += ThisRoundPoint;
                     }
+
                     else {
                         MoneyMap.mapDic[tempStayPosi] = CatchedBulletValue;
                     }
+
                     ResortMap();
-                    moneyBullet.transform.Translate(tempStayPosi);
+                    
+
                     //clean up things for next round
                     Destroy(moneyBullet);
                     positionsPool.Clear();
@@ -169,6 +198,12 @@ public class ShootingControl : MonoBehaviour {
         MoneyMap.IsneedAlignTiles = true;
     }
     //UnitCheck(position, value:1,2,6,24,0); init
+
+
+
+
+
+
 
     void OneRoundScore(Vector3 monPoint, int monValue)          //calculate surrounding tiles that has same value with projectiles which can add together as the score.
     {
@@ -191,38 +226,13 @@ public class ShootingControl : MonoBehaviour {
                 OneRoundScore(aroundPoint, monValue);
             }
         }
-
-        //if (MoneyMap.mapDic.ContainsKey(positionUP))
-        //{
-        //    if (MoneyMap.mapDic[positionUP] == monValue)
-        //    {
-        //        if (!positionsPool.Contains(monPoint))
-        //        {
-        //            positionsPool.Add(monPoint);
-        //        }
-        //        if (!positionsPool.Contains(positionUP))
-        //        {
-        //            positionsPool.Add(positionUP);
-        //            UnitCheck(positionUP, monValue);
-        //        }
-        //        if (MoneyMap.mapDic[positionLeft] == monValue) {
-        //            if (!positionsPool.Contains(positionLeft))
-        //            {
-        //                positionsPool.Add(positionLeft);
-        //                UnitCheck(positionLeft, monValue);
-        //            }
-        //        }
-        //        if (MoneyMap.mapDic[positionRight] == monValue) {
-        //            if (!positionsPool.Contains(positionRight))
-        //            {
-        //                positionsPool.Add(positionRight);
-        //                UnitCheck(positionRight, monValue);
-        //            }
-        //        }
-               
-        //    }
-        //}
     }
+
+
+
+
+
+
 
     bool ScoreValidation(int catchedValue, int scoreThisRound) {   //this function checks if the collected score is valid to perform merge action.
         switch (catchedValue) {
@@ -251,33 +261,100 @@ public class ShootingControl : MonoBehaviour {
 
     }
 
+    void SetScanner() {
+
+        int i = 0;
+        //stupid(me) using of for loop, ended each cells in scanner only contains the final tile of the map.
+        //for(int i = 0; i<length; i++) ha.....
+
+            for (float x = -3.5f; x <= 3.5f; x++) {
+                for (float y = 3.5f; y >= -4.5f; y--) {
+                    scanner[i] = new Vector3(x, y);
+                  i++;
+                }
+            }
+        
+
+    }
+
+
     void ResortMap() {          //lets hard-code a position pool.
-        Vector3[] scanner = new Vector3[72];
-        List<Vector3> toMoveArray = new List<Vector3>();
-      
-        moneyMap.moneyMapPositions.CopyTo(scanner, 7);
+        
+        List<Vector3> toMoveList = new List<Vector3>();
+       // Debug.Log("function got called");
         foreach (Vector3 position in scanner) {
-            if (MoneyMap.mapDic[position] != 0 && MoneyMap.mapDic.ContainsKey(position + Vector3.up) && MoneyMap.mapDic[position + Vector3.up] ==0)       //collect those need to resort tiles first.
-            {
-                toMoveArray.Add(position);
+
+            if (MoneyMap.mapDic[position] != 0 && MoneyMap.mapDic.ContainsKey(position + Vector3.up) && MoneyMap.mapDic[position + Vector3.up] ==0)      //collect those need to resort tiles first.
+            {  
+                toMoveList.Add(position);
             } 
         }
-        if (toMoveArray.Count != 0)
+        //to think about it, I should not use recursive calling here, because one the toMoveTile is formed, in this time window I should ONLY need to move those tiles to the designed position.
+
+        if (toMoveList.Count != 0)
         {
-            foreach (Vector3 toMoveTile in toMoveArray)
+            foreach (Vector3 toMoveTile in toMoveList)
             {
-                //swap, rescan until toMoveArray is empty;
+                //swap, rescan until toMoveList is empty;
                 int tempVal = MoneyMap.mapDic[toMoveTile];
                 MoneyMap.mapDic[toMoveTile] = MoneyMap.mapDic[toMoveTile + Vector3.up];
                 MoneyMap.mapDic[toMoveTile + Vector3.up] = tempVal;
             }
-            ResortMap();    //rescan;
+            ResortMap();    //rescan simple but wasty;
         }
-        MoneyMap.IsneedAlignTiles = true;
     }
 
 
+    //deprecated
+    void ResortMapOptimized() { //its actually not working cuz we still need to scan the entire map but first row.
+
+        List<Vector3> toMoveList = new List<Vector3>();
+        // Debug.Log("function got called");
+        foreach (Vector3 position in scanner)
+        {
+
+            if (MoneyMap.mapDic[position] != 0 && MoneyMap.mapDic.ContainsKey(position + Vector3.up) && MoneyMap.mapDic[position + Vector3.up] == 0)      //collect those need to resort tiles first.
+            {
+                toMoveList.Add(position);
+            }
+        }
+
+        while (toMoveList.Count != 0)
+        {
+            List<Vector3> toAddListTemp = new List<Vector3>();
+
+            //dont remove and add elements in foreach array.
+            foreach (Vector3 toMoveTile in toMoveList)
+            {
+              
+                if (toMoveTile.y != 4.5f && MoneyMap.mapDic[toMoveTile + Vector3.up] == 0)
+                {
+                    //swap, rescan until toMoveList is empty;
+                    int tempVal = MoneyMap.mapDic[toMoveTile];
+                    MoneyMap.mapDic[toMoveTile] = MoneyMap.mapDic[toMoveTile + Vector3.up];
+                    MoneyMap.mapDic[toMoveTile + Vector3.up] = tempVal;
+
+                    toAddListTemp.Add(toMoveTile + Vector3.up);
+                    
+                }
+
+            }
+            Debug.Log(toAddListTemp.Count);
+            toMoveList = toAddListTemp;
+            //toMoveList = toAddListTemp;
+           
+        }
+    }
+
+
+
+
+
     void CheckCombo() { }
+
+
+
+
 
 	// Update is called once per frame
 	void Update () {
@@ -285,8 +362,8 @@ public class ShootingControl : MonoBehaviour {
         {
             CatchBullet();    
         }
-        if (Input.GetKeyDown(KeyCode.F) && isHoldMoney) { //ready
-            moveBullet();
+        else if (Input.GetKeyDown(KeyCode.Space) && isHoldMoney) { //ready
+           // moveBullet();
             FireBullet();
             isHoldMoney = false;
         }

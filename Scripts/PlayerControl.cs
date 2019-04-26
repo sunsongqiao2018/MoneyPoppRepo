@@ -10,7 +10,7 @@ public class PlayerControl : MonoBehaviour {
 	void Start () {
         Player =gameObject;
         playerTran = Player.transform;
-
+        playerTran.position = new Vector3(-0.5f, -4.5f);
     }
 
     // Update is called once per frame
