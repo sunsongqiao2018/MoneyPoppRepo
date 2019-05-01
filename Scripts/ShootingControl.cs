@@ -28,17 +28,15 @@ public class ShootingControl : MonoBehaviour {
         isHoldMoney = false;
         moneyBullet = new GameObject();
         SetScanner();
-        //StartCoroutine(Example());
 
     }
     IEnumerator Example()           //just a try-out function on coroutine.
     {
-        while (true)
-        {
-           
+
+        Debug.Log("ha");
             yield return new WaitForSeconds(1);
-            print(Mathf.RoundToInt( Time.time));
-        }
+        
+        Debug.Log("la");
     }
     void LoadBullet(int value) {
         switch (value) {
@@ -114,6 +112,7 @@ public class ShootingControl : MonoBehaviour {
                 }
             }
             catch(KeyNotFoundException e) {
+                Debug.Log(e.Message);
             }
         }
         var step = moveSpeed * Time.deltaTime;
@@ -138,7 +137,10 @@ public class ShootingControl : MonoBehaviour {
                 if (MoneyMap.mapDic[tempVec] != 0 ||(y == 4.5f && MoneyMap.mapDic[tempVec] == 0))
                 {
                     MoneyMap.mapDic[tempStayPosi] = CatchedBulletValue;
-
+                   
+                        StartCoroutine(Example());
+                    
+                  
                     OneRoundScore(tempStayPosi, CatchedBulletValue);    //This function changes positionsPool.
 
 

@@ -8,9 +8,9 @@ public class PlayerControl : MonoBehaviour {
   
         // Use this for initialization
 	void Start () {
-        Player =gameObject;
+        Player = gameObject;
         playerTran = Player.transform;
-        playerTran.position = new Vector3(-0.5f, -4.5f);
+        playerTran.position = new Vector3(-0.5f, -4.5f,-0.1f);
     }
 
     // Update is called once per frame

@@ -16,7 +16,7 @@ public class MoneyMap : MonoBehaviour {
         IsneedAlignTiles = false;
         tiles = new GameObject[mapSize];
         LoadMap(mapSize);
-        Debug.Log(moneyMapPositions.Length);
+       
         InvokeRepeating("UpdateMapValues", 0.0f, 8.0f);        //constant update maps by time past.
         //totalSum = Random.Range(8, 100);
     }
@@ -161,7 +161,7 @@ public class MoneyMap : MonoBehaviour {
     void Update()
     {
         if (IsneedAlignTiles) {
-            Debug.Log("tiles re-aligned");
+           
             AlignTiles();
         }
         ///----------------Folded------------------//
